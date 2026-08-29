@@ -63,8 +63,21 @@ export const handlers = [
     return HttpResponse.json([{ index: 0, text: 'Contenido del chunk de prueba.', char_count: 31 }])
   }),
 
+  http.get(`${BASE_URL}/providers`, () => {
+    return HttpResponse.json({
+      generation: { default: 'google', available: ['google', 'anthropic'] },
+      embeddings: { active: 'google' },
+    })
+  }),
+
   http.post(`${BASE_URL}/ask`, async ({ request }) => {
-    const body = (await request.json()) as { question: string }
+    const body = (await request.json()) as { question: string; provider?: string }
+    const providerClass =
+      body.provider === 'google'
+        ? 'GoogleLLMProvider'
+        : body.provider === 'anthropic'
+          ? 'AnthropicLLMProvider'
+          : 'MockLLMProvider'
     return HttpResponse.json({
       answer: `Respuesta simulada para: "${body.question}"`,
       sources: [
@@ -76,7 +89,7 @@ export const handlers = [
           similarity: 0.71,
         },
       ],
-      provider: 'MockLLMProvider',
+      provider: providerClass,
     })
   }),
 ]

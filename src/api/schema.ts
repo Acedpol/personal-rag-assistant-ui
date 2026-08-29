@@ -91,6 +91,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Providers */
+        get: operations["get_providers_providers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -118,6 +135,8 @@ export interface components {
             question: string;
             /** Top K */
             top_k?: number | null;
+            /** Provider */
+            provider?: ("google" | "anthropic") | null;
         };
         /** AskResponse */
         AskResponse: {
@@ -183,10 +202,27 @@ export interface components {
              */
             uploaded_at: string;
         };
+        /** EmbeddingProviderInfo */
+        EmbeddingProviderInfo: {
+            /** Active */
+            active: string;
+        };
+        /** GenerationProviders */
+        GenerationProviders: {
+            /** Default */
+            default: string;
+            /** Available */
+            available: string[];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** ProvidersResponse */
+        ProvidersResponse: {
+            generation: components["schemas"]["GenerationProviders"];
+            embeddings: components["schemas"]["EmbeddingProviderInfo"];
         };
         /** SearchRequest */
         SearchRequest: {
@@ -436,6 +472,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_providers_providers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProvidersResponse"];
                 };
             };
         };
