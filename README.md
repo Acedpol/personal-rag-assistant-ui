@@ -42,3 +42,9 @@ npm run gen:api
 ```bash
 npm test
 ```
+
+## Bugs reales encontrados construyendo esto
+
+1. **`openapi-fetch` no construye `multipart/form-data` automáticamente**: pasarle un body tipado a `apiClient.POST('/documents', { body: { file } })` no arma un `FormData` real — la subida de documentos fallaba con 422 hasta añadir un `bodySerializer` explícito. Encontrado reproduciendo el fallo contra el backend real, no asumido. Documentado también como gotcha reutilizable en la Skill `scaffold-react-frontend`.
+2. **`File` de jsdom vs. `File` de undici rompe los tests de subida**: en el entorno de test (Vitest + jsdom + MSW), un `File` construido con el `File` global de jsdom no lo reconoce el parser de multipart de undici que usa MSW en Node — y a la inversa, un `File` de `node:buffer` sí lo reconoce el servidor pero pierde el nombre al pasar por `input.files` de jsdom. Sin solución limpia dentro de ese entorno; se verificó el flujo real en el navegador (sí funciona) y se mockeó solo esa interacción concreta en el test, con el resto de peticiones pasando por MSW real. También documentado en la Skill `scaffold-react-frontend`.
+3. **Enviar `provider: "mock"` a `/ask` devuelve 422**: cuando el backend no tiene ninguna API key configurada, `GET /providers` informa `default: "mock"` — pero `AskRequest.provider` del backend solo acepta `"google" | "anthropic" | null`, nunca `"mock"` (no es una elección real de proveedor, es la ausencia de una). El frontend enviaba ese valor tal cual. Encontrado verificando en el navegador contra el backend real (no solo contra los mocks de MSW, que no habrían detectado el desajuste de contrato) — corregido filtrando `"mock"` antes de enviarlo, con test de regresión que inspecciona el body real de la petición.
