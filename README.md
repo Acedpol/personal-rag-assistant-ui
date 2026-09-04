@@ -17,6 +17,10 @@ Repo independiente que consume el backend RAG únicamente por HTTP — nunca com
 
 El backend (`personal-rag-assistant`) no tiene auth — herramienta de un solo usuario, una colección compartida. Este frontend no incluye login ni gestión de sesión.
 
+## Selección de proveedor de respuestas
+
+La pantalla de Preguntar incluye un toggle Google Gemini / Claude, con Gemini como opción por defecto. Las opciones disponibles se leen de `GET /providers` del backend en tiempo real — si una de las dos no tiene su API key configurada ahí, el botón correspondiente aparece deshabilitado en vez de dejar elegirla y caer en silencio a una respuesta simulada. No hay variables de entorno de proveedor en este frontend (nada como `VITE_DEFAULT_PROVIDER`) — la disponibilidad depende siempre del backend, nunca de configuración estática aquí.
+
 ## Arrancar en local
 
 Con el backend corriendo en `http://127.0.0.1:8010`:
